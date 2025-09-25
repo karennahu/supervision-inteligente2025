@@ -1,0 +1,102 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.action_chains import ActionChains
+import time
+import matplotlib.pyplot as plt
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.pagesizes import A4
+
+service = Service("chromedriver.exe")  # Ajusta la ruta a tu chromedriver
+driver = webdriver.Chrome(service=service)
+driver.maximize_window()
+
+
+url = "https://lookerstudio.google.com/u/0/reporting/ea3fb237-17c6-49c6-956b-77b33774ce9a/page/X9kcE"
+
+driver.get(url)
+
+time.sleep(15)  
+apartados = [
+    ("TERMINADO", "#7CFC00"),               
+    ("REVISIÓN", "#FFD700"),                
+    ("RETRABAJO", "#8B008B"),               
+    ("DETECTADOS", "#FF0000"),              
+    ("TERMINADO CON MONITOREO ACTIVO", "#006400")  
+]
+
+datos = {
+    "Baches reparados": [],
+    "M2 totales": [],
+    "Metros lineales aprox": []
+}
+
+
+for nombre, color in apartados:
+    #
+    try:
+        boton = driver.find_element(By.XPATH, f"//*[contains(text(),'{nombre}')]")
+        ActionChains(driver).move_to_element(boton).click().perform()
+        time.sleep(6)  # Esperar que cambien los datos
+    except:
+        print(f"⚠️ No se encontró el botón de {nombre}, revisar selector")
+
+    # 🔹 Ahora tomamos los 3 números generales
+    try:
+        totales = driver.find_elements(By.CLASS_NAME, "kfZ0Pe")  # Ajustar según el DOM real
+        valores = [t.text for t in totales if t.text.strip() != ""]
+        if len(valores) >= 3:
+            datos["Baches reparados"].append(int(valores[0].replace(",", "").split()[0]))
+            datos["M2 totales"].append(int(valores[1].replace(",", "").split()[0]))
+            datos["Metros lineales aprox"].append(int(valores[2].replace(",", "").split()[0]))
+    except:
+        print(f"⚠️ No se pudieron leer los datos de {nombre}")
+
+driver.quit()
+
+# =========================
+# GENERAR GRÁFICAS
+# =========================
+def generar_grafica(valores, titulo, filename, colores):
+    plt.figure(figsize=(6,4))
+    bars = plt.bar([a[0] for a in apartados], valores, color=colores)
+    plt.title(titulo, fontsize=14, fontweight="bold")
+    
+    # Escribir los valores encima de cada barra
+    for bar, val in zip(bars, valores):
+        plt.text(bar.get_x() + bar.get_width()/2, bar.get_height() + (bar.get_height()*0.01),
+                 str(val), ha='center', va='bottom', fontsize=10, fontweight="bold")
+    
+    plt.xticks(rotation=20)
+    plt.tight_layout()
+    plt.savefig(filename)
+    plt.close()
+
+colores = [c for _, c in apartados]
+generar_grafica(datos["Baches reparados"], "Baches Reparados", "grafica_baches.png", colores)
+generar_grafica(datos["M2 totales"], "M2 Totales", "grafica_m2.png", colores)
+generar_grafica(datos["Metros lineales aprox"], "Metros Lineales Aprox", "grafica_metros.png", colores)
+
+# =========================
+# GENERAR PDF
+# =========================
+doc = SimpleDocTemplate("Reporte_Bacheo.pdf", pagesize=A4)
+styles = getSampleStyleSheet()
+story = []
+
+# Título
+story.append(Paragraph("<b><font size=18>SUPERVISIÓN INTELIGENTE</font></b>", styles['Title']))
+story.append(Spacer(1, 20))
+
+# Insertar gráficas
+story.append(Image("grafica_baches.png", width=400, height=250))
+story.append(Spacer(1, 15))
+story.append(Image("grafica_m2.png", width=400, height=250))
+story.append(Spacer(1, 15))
+story.append(Image("grafica_metros.png", width=400, height=250))
+
+doc.build(story)
+
+print("✅ Reporte generado: Reporte_Bacheo.pdf")
+
