@@ -6,6 +6,11 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+
+
 from playwright.async_api import async_playwright
 import matplotlib.pyplot as plt
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image as RLImage, Table, TableStyle

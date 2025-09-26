@@ -3,5 +3,6 @@ playwright==1.47.0
 reportlab==4.2.2
 gunicorn==23.0.0
 greenlet==3.0.3
-
-
+matplotlib==3.7.5
+numpy==1.26.4
+pillow==11.0.0
