@@ -17,7 +17,7 @@
     <div class="relative container mx-auto px-6 py-12 text-center">
       <div class="flex items-center justify-center gap-6 mb-6">
         <div class="p-4 bg-red-600 rounded-full shadow-lg">
-          <img src="rojo.jpg"  class="h-12 w-auto filter brightness-0 invert"/>
+          <img src="{{ url_for('static', filename='rojo.jpg') }}" class="h-12 w-auto filter brightness-0 invert"/>
         </div>
       </div>
       <div class="space-y-4">
@@ -143,7 +143,7 @@
     <footer class="text-center space-y-4">
       <div class="max-w-2xl mx-auto">
         <div class="flex items-center justify-center gap-4 mb-4">
-          <img src="Toluca-logo-outline-blanco.png" alt="Logo Toluca" class="h-24 w-auto opacity-70"/>
+          <img src="{{ url_for('static', filename='Toluca-logo-outline-blanco.png') }}" alt="Logo Toluca" class="h-24 w-auto opacity-70"/>
         </div>
         <div class="space-y-2 text-gray-500 dark:text-gray-400">
           <p class="font-medium">© 2025 Toluca - Capital de Oportunidades y Progreso</p>
