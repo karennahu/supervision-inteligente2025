@@ -1,3 +1,11 @@
+import subprocess
+
+# Instalar Chromium si no existe (solo primera vez en Render)
+try:
+    subprocess.run(["playwright", "install", "chromium"], check=True)
+except Exception as e:
+    print("⚠️ No se pudo instalar Chromium automáticamente:", e)
+
 import os
 import asyncio
 from flask import Flask, send_file, render_template
