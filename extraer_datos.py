@@ -100,16 +100,16 @@ async def extraer_datos(playheadless=False, slow_mo=150):
     indice_seccion = 0
 
     async with async_playwright() as p:
-       browser = await p.chromium.launch(
-    headless=True,  # siempre en True en Render
-    args=[
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-        "--single-process",
-        "--disable-gpu"
-    ]
-)
+        browser = await p.chromium.launch(
+            headless=True,  # siempre en True en Render
+            args=[
+                "--no-sandbox",
+                "--disable-setuid-sandbox",
+                "--disable-dev-shm-usage",
+                "--single-process",
+                "--disable-gpu"
+            ]
+        )
         page = await browser.new_page()
 
         async def handle_response(response):
@@ -326,8 +326,10 @@ def generar_pdf_final(data_reporte, archivo_pdf="Reporte_Supervision.pdf",
     doc.build(elementos)
 
     for f in imgs_temp:
-        try: os.remove(f)
-        except Exception: pass
+        try:
+            os.remove(f)
+        except Exception:
+            pass
 
     print(f"✅ PDF generado: {archivo_pdf}")
 
@@ -340,5 +342,3 @@ if __name__ == "__main__":
     for s, vals in datos.items():
         print(f"{s}: {vals}")
     generar_pdf_final(datos, archivo_pdf="Reporte_Supervision.pdf")
-
-    
