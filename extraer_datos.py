@@ -100,7 +100,16 @@ async def extraer_datos(playheadless=False, slow_mo=150):
     indice_seccion = 0
 
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=playheadless, slow_mo=slow_mo)
+       browser = await p.chromium.launch(
+    headless=True,  # siempre en True en Render
+    args=[
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--single-process",
+        "--disable-gpu"
+    ]
+)
         page = await browser.new_page()
 
         async def handle_response(response):
